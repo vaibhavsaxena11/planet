@@ -30,6 +30,11 @@ from planet import tools
 Task = collections.namedtuple(
     'Task', 'name, env_ctor, max_length, state_components')
 
+def moving_mnist(config, params):
+  max_length = 20
+  state_components = ['reward']
+  env_ctor = lambda: None
+  return Task('moving_mnist', env_ctor, max_length, state_components)
 
 def cartpole_balance(config, params):
   action_repeat = params.get('action_repeat', 8)
@@ -114,6 +119,16 @@ def gym_racecar(config, params):
       _gym_env, action_repeat, config.batch_shape[1], max_length,
       'CarRacing-v0', obs_is_image=True)
   return Task('gym_racing', env_ctor, max_length, state_components)
+
+
+def gym_bipedalwalker(config, params):
+  action_repeat = params.get('action_repeat', 2)
+  max_length = 1000 // action_repeat
+  state_components = ['reward']
+  env_ctor = functools.partial(
+      _gym_env, action_repeat, config.batch_shape[1], max_length,
+      'BipedalWalker-v2', obs_is_image=False)
+  return Task('gym_bipedalwalker', env_ctor, max_length, state_components)
 
 
 def _dm_control_env(action_repeat, max_length, domain, task):
