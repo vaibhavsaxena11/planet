@@ -147,7 +147,9 @@ def _training_schedule(config, params):
   config.savers = [tools.AttrDict(exclude=(r'.*_temporary.*',))]
   config.mean_metrics_every = config.train_steps // 10
   config.train_dir = os.path.join(params.logdir, 'train_episodes')
+  # config.train_dir = os.path.join('data', 'train_episodes') ##
   config.test_dir = os.path.join(params.logdir, 'test_episodes')
+  # config.test_dir = os.path.join('data', 'test_episodes') ##
   config.random_collects = _initial_collection(config, params)
   config.sim_collects = _active_collection(config, params)
   config.sim_summaries = tools.AttrDict(_unlocked=True)
@@ -170,14 +172,14 @@ def _define_optimizers(config, params):
       schedule=functools.partial(tools.schedule.linear, ramp=10000),
       clipping=params.get('gradient_clipping', 1000.0))
   optimizers.main = functools.partial(
-      tools.CustomOptimizer, include=r'.*', exclude=diagnostics, **kwargs)
+      tools.CustomOptimizer, include=r'.*', exclude=diagnostics, name='main', **kwargs)
   for name in config.heads:
     assert config.zero_step_losses.get(name), name
     # Diagnostic heads use separate optimizers to not interfere with the model.
     if name in gradient_heads:
       continue
     optimizers[name] = functools.partial(
-        tools.CustomOptimizer, include=r'.*/head_{}/.*'.format(name), **kwargs)
+        tools.CustomOptimizer, include=r'.*/head_{}/.*'.format(name), name=name, **kwargs)
   return optimizers
 
 
