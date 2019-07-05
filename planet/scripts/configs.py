@@ -87,6 +87,12 @@ def _model_components(config, params):
         params.get('future_mix', True),
         params.get('mean_only', False),
         params.get('min_stddev', 1e-1))
+  elif model == 'rssm_prod':
+    config.cell = functools.partial(
+        models.RSSM_prod, state_size, size, size,
+        params.get('future_mix', True),
+        params.get('mean_only', False),
+        params.get('min_stddev', 1e-1))
   else:
     raise NotImplementedError("Unknown model '{}.".format(params.model))
   return config
